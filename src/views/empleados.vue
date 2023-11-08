@@ -48,6 +48,23 @@ export default {
                     console.error("Error al consultar la API", error);
                 });
         },
+        eliminarEmpleado(empleado){
+            const index=this.empleados.indexOf(empleado);
+            if(index !==-1){
+                this.empleados.splice(index,1);
+            }
+            const empleadoId=
+            axios.delete("http://localhost:8080/api/empleados/${empleadoId}").then(
+                (response)={
+
+                })
+                .catch((error)=>{
+                    console.error("Error al eliminar el empleado en la API", error);
+
+                })
+
+
+        },
        
         agregarEmpleados() {
             this.$router.push({ name: 'agregarEmpleado' });
