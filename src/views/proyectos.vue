@@ -2,8 +2,14 @@
     <div>
       <h1>Gestion de Proyectos</h1>
       <div>
-        <v-btn @click="fecthProyectos()">Consultar Proyectos</v-btn>
-        {{proyectos.descripcion}}
+        <v-btn color="primary" @click="fecthProyectos()">Consultar Proyectos</v-btn>
+        <v-btn color="success" @click="agregarProyecto()">Agregar Proyecto</v-btn>
+        <div v-if="proyectos.length>0">
+            <v-data-table :headers="headers">
+
+            </v-data-table>
+        </div>
+    
       </div>
     </div>
   </template>
