@@ -49,43 +49,42 @@ export default {
     },
   },
   methods: {
-    fetchEmpleados() {
-      axios
-        .get("http://localhost:8080/api/empleados/getempleados")
-        .then((response) => {
-          if (Array.isArray(response.data)) {
-            this.empleados = response.data; // Almacena la matriz de empleados
-          } else {
-            console.error("La respuesta de la API no contiene datos válidos", response);
-          }
-        })
-        .catch((error) => {
-          console.error("Error al consultar la API", error);
-        });
-    },
-    eliminarEmpleado(item) {
-
-      const empleadoId = item.idEmpleado;
-      const index = this.empleados.indexOf(item);
-
-      this.empleados.splice(index, 1);
-
-
-
-
-      // Ahora puedes utilizar empleadoId en tu solicitud de eliminación
-      axios
-        .delete(`http://localhost:8080/api/empleados/${empleadoId}`)
-        .then((response) => {
-          console.log("Empleado Borrado Perfectamente");
-        })
-        .catch((error) => {
-          console.error("Error al eliminar el empleado en la API", error);
-        });
-    },
-    agregarEmpleados() {
-      this.$router.push({ name: 'agregarEmpleado' });
-    },
+  fetchEmpleados() {
+    axios
+      .get("http://localhost:8080/api/empleados/getempleados")
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          // Filtra la lista de empleados para excluir aquellos con fechaBaja no nula
+          this.empleados = response.data.filter(empleado => empleado.fechaBaja === null);
+        } else {
+          console.error("La respuesta de la API no contiene datos válidos", response);
+        }
+      })
+      .catch((error) => {
+        console.error("Error al consultar la API", error);
+      });
   },
+  eliminarEmpleado(item) {
+    const empleadoId = item.idEmpleado;
+    const index = this.empleados.indexOf(item);
+
+    // Elimina el empleado localmente
+    this.empleados.splice(index, 1);
+
+    // Envía una solicitud al servidor para dar de baja al empleado
+    axios
+      .put(`http://localhost:8080/api/empleados/dardebaja/${empleadoId}`)
+      .then((response) => {         
+        console.log("Borrado de la lista");
+      })
+      .catch((error) => {
+        console.error("Error al dar de baja al empleado en la API", error);
+      });
+  },
+  agregarEmpleados() {
+    this.$router.push({ name: 'agregarEmpleado' });
+  },
+},
+
 };
 </script>

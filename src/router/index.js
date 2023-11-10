@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import empleados from '../views/empleados.vue';
 import proyectos from '../views/proyectos.vue';
 import agregarEmpleado from '../views/agregarEmpleado.vue';
+import agregarProyecto from '../views/agregarProyecto.vue';
 
 
 
@@ -23,6 +24,11 @@ const routes = [
     path: '/agregarEmpleado',
     name: 'agregarEmpleado',
     component: agregarEmpleado
+  },
+  {
+    path: '/agregarProyecto',
+    name: 'agregarProyecto',
+    component: agregarProyecto
   },
 ];
 

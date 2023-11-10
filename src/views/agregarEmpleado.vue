@@ -39,35 +39,8 @@
               <v-btn text color="primary" @click="menuNacimiento = false">Cancel</v-btn>
               <v-btn text color="primary" @click="$refs.menuNacimiento.save(fechaNacimiento)">OK</v-btn>
             </v-date-picker>
-          </v-menu>
-        </v-flex>
-        <v-spacer></v-spacer>
-        <v-flex xs12 sm6 md4>
-          <v-dialog
-            ref="dialogBaja"
-            v-model="modalBaja"
-            :return-value.sync="fechaBaja"
-            persistent
-            lazy
-            full-width
-            width="290px"
-          >
-            <template v-slot:activator="{ on }">
-              <v-text-field
-                v-model="fechaBaja"
-                label="Fecha de Baja"
-                readonly
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker v-model="fechaBaja" scrollable>
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="modalBaja = false">Cancel</v-btn>
-              <v-btn text color="primary" @click="$refs.dialogBaja.save(fechaBaja)">OK</v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-flex>
-        <v-flex xs12 sm6 md4>
+          </v-menu>      
+        
           <v-menu
             ref="menuAlta"
             v-model="menuAlta"
@@ -131,8 +104,7 @@ export default {
       telefono1: '',
       telefono2: '',
       email: '',
-      fechaAlta: '', // Fecha en formato "yyyy-MM-dd"
-      fechaBaja: '', // Fecha en formato "yyyy-MM-dd"
+      fechaAlta: '', // Fecha en formato "yyyy-MM-dd"      
       estadoCivil: '',
       servicioMilitar: '',
       mensaje: null,
@@ -149,6 +121,22 @@ export default {
       this.mostrarDialogoConfirmacion = true;
     },
     agregarEmpleado() {
+      if (
+    !this.nif ||
+    !this.nombre ||
+    !this.apellido1 ||
+    !this.apellido2 ||
+    !this.fechaNacimiento ||
+    !this.telefono1 ||
+    !this.telefono2 ||
+    !this.email ||
+    !this.fechaAlta ||
+    !this.estadoCivil ||
+    !this.servicioMilitar
+  ) {
+    this.mensaje = { tipo: 'error', texto: 'Todos los campos deben estar completados' };
+    return;
+  }
       // Verificar el formato del correo electrónico antes de enviar la solicitud y del nif
       if((!this.validarFormatoEmail(this.email))||(!this.validarFormatoNif(this.nif))) {
         this.emailFormatError = true;
@@ -156,15 +144,16 @@ export default {
         return; // Evitar el envío si el formato es incorrecto
       }
 
-      const url = `http://localhost:8080/api/empleados/agregarempleado?nif=${this.nif}&nombre=${this.nombre}&apellido1=${this.apellido1}&apellido2=${this.apellido2}&fechaNacimiento=${this.fechaNacimiento}&telefono1=${this.telefono1}&telefono2=${this.telefono2}&email=${this.email}&fechaAlta=${this.fechaAlta}&fechaBaja=${this.fechaBaja}&estadoCivil=${this.estadoCivil === 'Soltero' ? 'Soltero' : 'Casado'}&servicioMilitar=${this.servicioMilitar === 'Si' ? 'NO' : 'SI'}`;
+      const url = `http://localhost:8080/api/empleados/agregarempleado?nif=${this.nif}&nombre=${this.nombre}&apellido1=${this.apellido1}&apellido2=${this.apellido2}&fechaNacimiento=${this.fechaNacimiento}&telefono1=${this.telefono1}&telefono2=${this.telefono2}&email=${this.email}&fechaAlta=${this.fechaAlta}&estadoCivil=${this.estadoCivil === 'Soltero' ? 'Soltero' : 'Casado'}&servicioMilitar=${this.servicioMilitar === 'Si' ? 'NO' : 'SI'}`;
       axios.post(url)
         .then((response) => {
           if (response.data) {
+            console.log(response.data);
             this.mensaje = { tipo: 'success', texto: 'Empleado agregado con éxito' };
             this.emailFormatError = false;
             this.nifFormatError=false;
           } else {
-            this.mensaje = { tipo: 'error', texto: 'Error al agregar el empleado' };
+            this.mensaje = { tipo: 'error', texto: 'Todos los campos deben estar completados' };
           }
         })
         .catch((error) => {
