@@ -4,6 +4,7 @@ import empleados from '../views/empleados.vue';
 import proyectos from '../views/proyectos.vue';
 import agregarEmpleado from '../views/agregarEmpleado.vue';
 import agregarProyecto from '../views/agregarProyecto.vue';
+import asignarEmpAPro from '../views/asignarEmpAPro.vue';
 
 
 
@@ -29,6 +30,11 @@ const routes = [
     path: '/agregarProyecto',
     name: 'agregarProyecto',
     component: agregarProyecto
+  },
+  {
+    path: '/asignarEmpAPro',
+    name: 'asignarEmpAPro',
+    component: asignarEmpAPro
   },
 ];
 

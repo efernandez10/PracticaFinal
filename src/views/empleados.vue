@@ -50,6 +50,7 @@ export default {
   },
   methods: {
   fetchEmpleados() {
+    console.log(this.empleados);
     axios
       .get("http://localhost:8080/api/empleados/getempleados")
       .then((response) => {

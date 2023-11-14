@@ -110,7 +110,6 @@ export default {
       mensaje: null,
       mostrarDialogoConfirmacion: false,
       menuNacimiento: false,
-      modalBaja: false,
       menuAlta: false,
       emailFormatError: false, // Variable para rastrear errores de formato de correo electrónico
       nifFormatError:false,
