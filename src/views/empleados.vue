@@ -55,7 +55,7 @@ export default {
       .get("http://localhost:8080/api/empleados/getempleados")
       .then((response) => {
         if (Array.isArray(response.data)) {
-          // Filtra la lista de empleados para excluir aquellos con fechaBaja no nula
+         
           this.empleados = response.data.filter(empleado => empleado.fechaBaja === null);
         } else {
           console.error("La respuesta de la API no contiene datos válidos", response);
@@ -69,10 +69,10 @@ export default {
     const empleadoId = item.idEmpleado;
     const index = this.empleados.indexOf(item);
 
-    // Elimina el empleado localmente
+   
     this.empleados.splice(index, 1);
 
-    // Envía una solicitud al servidor para dar de baja al empleado
+    
     axios
       .put(`http://localhost:8080/api/empleados/dardebaja/${empleadoId}`)
       .then((response) => {         

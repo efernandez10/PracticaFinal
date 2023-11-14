@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <!-- Bloque de proyectos a la izquierda -->
+
       <v-col class="mb-6" cols="12" md="6">
         <v-card>
           <v-card-title class="headline">Asignar Empleado a Proyecto</v-card-title>
@@ -9,10 +9,10 @@
             <v-row>
               <v-col>
                 <v-form>
-                  <!-- Checkboxes para proyectos -->
-                  <label>Seleccionar Proyectos:</label>
-                  <v-checkbox v-for="(proyecto, index) in proyectos" :key="index" v-model="proyectosSeleccionados"
-                    :label="proyecto.descripcion" :value="proyecto.descripcion"></v-checkbox>
+
+                  <label>Seleccionar Proyecto:</label>
+                  <v-select v-model="proyectoSeleccionado" :items="proyectos" item-text="descripcion"
+                    item-value="idProyecto" @change="onProyectoSeleccionado"></v-select>
                 </v-form>
               </v-col>
             </v-row>
@@ -20,25 +20,31 @@
         </v-card>
       </v-col>
 
-      <!-- Bloque de empleados a la derecha -->
       <v-col class="mb-6" cols="12" md="6">
         <v-card>
           <v-card-text>
             <v-row>
               <v-col>
                 <v-form>
-                  <!-- Checkboxes para empleados -->
+
                   <label>Seleccionar Empleados:</label>
                   <v-checkbox v-for="(empleado, index) in empleados" :key="index" v-model="empleadosSeleccionados"
-                    :label=empleado.nombre :value="empleado.nombre"></v-checkbox>
-                  <v-btn @click="imprimirId" color="primary">
-                    Imprimir ID
-                  </v-btn>
+                    :label="`${empleado.nombre} ${empleado.apellido1} ${empleado.apellido2}`" :value="empleado.idEmpleado"
+                    :checked="empleadosAsociadosAsignacion.includes(empleado.idEmpleado)"
+                    @change="toggleEmpleadoAsociado(empleado.idEmpleado)" ref="miCheckbox">
+                  </v-checkbox>
+
                 </v-form>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row v-if="proyectoSeleccionado">
+      <v-col>
+        <p>ID del proyecto seleccionado: {{ proyectoSeleccionado }}</p>
       </v-col>
     </v-row>
   </v-container>
@@ -54,7 +60,8 @@ export default {
       proyectos: [],
       asignaciones: [],
       empleadosSeleccionados: [],
-      proyectosSeleccionados: [],
+      proyectoSeleccionado: null,
+      empleadosAsociadosAsignacion: [],
     };
   },
   mounted() {
@@ -66,9 +73,9 @@ export default {
     fetchAsignacion() {
       axios.get("http://localhost:8080/api/asignacion/getasignaciones").then(response => {
         this.asignaciones = response.data;
-      }).
-        catch.error("Error al obtener las asignaciones", error);
-
+      }).catch(error => {
+        console.error("Error al obtener las asignaciones", error);
+      });
     },
     fetchEmpleados() {
       axios.get('http://localhost:8080/api/empleados/getempleados')
@@ -82,42 +89,67 @@ export default {
     fetchProyectos() {
       axios.get('http://localhost:8080/api/proyectos/getproyectos')
         .then(response => {
-
           this.proyectos = response.data.filter(proyecto => proyecto.fechaBaja === null);
         })
         .catch(error => {
           console.error('Error al obtener la lista de proyectos', error);
         });
     },
-    imprimirId() {
-      let idemp;
-      this.empleados.forEach(empleado => {
-        if (this.empleadosSeleccionados.includes(empleado.nombre)) {
-          idemp = empleado.idEmpleado;
-        }
-      });
+    async onProyectoSeleccionado() {
+      console.log('Proyecto seleccionado (ID):', this.proyectoSeleccionado);
 
-      let idpro;
-      this.proyectos.forEach(proyecto => {
-        if (this.proyectosSeleccionados.includes(proyecto.descripcion)) {
-          idpro = proyecto.idProyecto;
-        }
-      });
+      try {
+        const response = await axios.get("http://localhost:8080/api/asignacion/getasignaciones");
+        const asignacionesFiltradas = response.data;
 
-      console.log('Empleados asignados:', idemp);
-      console.log('Proyectos asignados:', idpro);
+        this.empleadosAsociadosAsignacion = [];
 
-      axios.post(`http://localhost:8080/api/asignacion/agregarasignacion?idEmpleado=${idemp}&idProyecto=${idpro}`)
-        .then(response => {
-          console.log(response.data);
-        })
-        .catch(error => {
-          console.error('Error al agregar asignación', error);
+        asignacionesFiltradas.forEach(asignacion => {
+          if (this.proyectoSeleccionado == asignacion.idProyecto) {
+            this.empleadosAsociadosAsignacion.push(asignacion.idEmpleado);
+            console.log('ID de empleado asociado al proyecto:', asignacion.idEmpleado);
+          }
         });
-    }
+        console.log('Empleados asociados:', this.empleadosAsociadosAsignacion);
+      } catch (error) {
+        console.error('Error al obtener asignaciones', error);
+      }
+    },
+    toggleEmpleadoAsociado(idEmpleado) {
+  const miCheckbox = this.$refs.miCheckbox;
 
+  if (this.empleadosAsociadosAsignacion.includes(idEmpleado)) {
+    axios.delete(`http://localhost:8080/api/asignacion/eliminarasignacion?idEmpleado=${idEmpleado}&idProyecto=${this.proyectoSeleccionado}`)
+      .then(response => {
+        console.log(response.data);
+        console.log("empleado eliminado");
+      })
+      .catch(error => {
+        console.error('Error al eliminar asignación', error);
+      });
+  } else {
+    axios.post(`http://localhost:8080/api/asignacion/agregarasignacion?idEmpleado=${idEmpleado}&idProyecto=${this.proyectoSeleccionado}`)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('Error al agregar asignación', error);
+      });
   }
-}
+
+  if (this.empleadosAsociadosAsignacion.includes(idEmpleado)) {
+    this.empleadosAsociadosAsignacion = this.empleadosAsociadosAsignacion.filter(id => id !== idEmpleado);
+  } else {
+    this.empleadosAsociadosAsignacion.push(idEmpleado);
+  }
+
+  
+  miCheckbox.forEach(checkbox => {
+    const empleadoId = parseInt(checkbox.value);
+    const checkboxProyecto = this.asignaciones.find(asignacion => asignacion.idEmpleado === empleadoId)?.idProyecto;
+    checkbox.$el.checked = this.empleadosAsociadosAsignacion.includes(empleadoId) && checkboxProyecto === this.proyectoSeleccionado;
+  });
+},
+  },
+};
 </script>
-
-

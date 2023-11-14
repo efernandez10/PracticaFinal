@@ -55,7 +55,7 @@ export default {
                 .get("http://localhost:8080/api/proyectos/getproyectos")
                 .then((response) => {
                     if (Array.isArray(response.data)) {
-                        // Filtra la lista de proyectos para excluir aquellos con fechaBaja no nula
+                        
                         this.proyectos = response.data.filter(proyecto => proyecto.fechaBaja === null);
                     } else {
                         console.error("La respuesta de la API no contiene datos válidos", response);
@@ -68,9 +68,9 @@ export default {
         eliminarProyecto(item) {
             const proyectoId = item.idProyecto;
             const index = this.proyectos.indexOf(item);
-            // Elimina el Proyecto localmente
+           
             this.proyectos.splice(index, 1);
-            // Envía una solicitud al servidor para dar de baja al proyecto
+            
             axios
                 .put(`http://localhost:8080/api/proyectos/dardebaja/${proyectoId}`)
                 .then((response) => {

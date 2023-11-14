@@ -100,18 +100,18 @@ export default {
       nombre: '',
       apellido1: '',
       apellido2: '',
-      fechaNacimiento: '', // Fecha en formato "yyyy-MM-dd"
+      fechaNacimiento: '', 
       telefono1: '',
       telefono2: '',
       email: '',
-      fechaAlta: '', // Fecha en formato "yyyy-MM-dd"      
+      fechaAlta: '',       
       estadoCivil: '',
       servicioMilitar: '',
       mensaje: null,
       mostrarDialogoConfirmacion: false,
       menuNacimiento: false,
       menuAlta: false,
-      emailFormatError: false, // Variable para rastrear errores de formato de correo electrónico
+      emailFormatError: false, 
       nifFormatError:false,
     };
   },
@@ -136,11 +136,11 @@ export default {
     this.mensaje = { tipo: 'error', texto: 'Todos los campos deben estar completados' };
     return;
   }
-      // Verificar el formato del correo electrónico antes de enviar la solicitud y del nif
+      
       if((!this.validarFormatoEmail(this.email))||(!this.validarFormatoNif(this.nif))) {
         this.emailFormatError = true;
         this.nifFormatError=true;
-        return; // Evitar el envío si el formato es incorrecto
+        return; 
       }
 
       const url = `http://localhost:8080/api/empleados/agregarempleado?nif=${this.nif}&nombre=${this.nombre}&apellido1=${this.apellido1}&apellido2=${this.apellido2}&fechaNacimiento=${this.fechaNacimiento}&telefono1=${this.telefono1}&telefono2=${this.telefono2}&email=${this.email}&fechaAlta=${this.fechaAlta}&estadoCivil=${this.estadoCivil === 'Soltero' ? 'Soltero' : 'Casado'}&servicioMilitar=${this.servicioMilitar === 'Si' ? 'NO' : 'SI'}`;
